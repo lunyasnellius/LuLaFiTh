@@ -1,0 +1,16 @@
+x- gauge field
+x- gauge multiplication operation
+- plaquette computation
+- gauge action (?)
+- conj momenta rand. sample
+- Hamiltonian function
+- momentum update
+- gauge update
+- leapfrog integrator (function of del_t, t_0)
+- metropolis accept/reject
+- import/export/store configuration
+
+- calculate oservable
+- calculate autocorrelation
+
+
