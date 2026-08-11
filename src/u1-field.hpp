@@ -1,7 +1,4 @@
 #pragma once
-#include <cmath>
-#include <array>
-#include <numbers>
 
 #include "include/core.hpp"
 #include "include/rand.hpp"
@@ -18,10 +15,10 @@ struct theta {
 		val = constrain(value);
 	}
 
-	theta operator*(theta other) {
-		val += other.val;
-		return theta(val);
-	}
+//	theta operator*(theta other) {
+//		val += other.val;
+//		return theta(val);
+//	}
 
 }; // end of theta
 

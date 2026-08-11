@@ -1,6 +1,4 @@
-#include <iostream>
-
-#include "u1-action.hpp"
+#include "include.hpp"
 
 
 int main() {

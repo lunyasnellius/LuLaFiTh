@@ -1,5 +1,11 @@
 #pragma once
 #include <numbers>
+#include <complex>
+#include <random>
+#include <cmath>
+#include <array>
+#include <numbers>
+#include <iostream>
 
 
 double pi_val = std::numbers::pi_v<double>;
