@@ -1,4 +1,4 @@
 # ignore current build
 /build/
-/depr/
+/src/depr/
 
