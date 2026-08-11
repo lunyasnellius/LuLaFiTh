@@ -7,6 +7,7 @@
 #include <numbers>
 #include <iostream>
 
+constexpr int N_DIM = 4;
 
 double pi_val = std::numbers::pi_v<double>;
 
@@ -31,9 +32,9 @@ double constrain(double angle) {
 
 int periodic(int index) {
 	if (index < 0) {
-		return 8 + index;
-	} else if (index > 7) {
-		return index - 8;
+		return N_DIM + index;
+	} else if (index > N_DIM - 1) {
+		return index - N_DIM;
 	} else {
 		return index;
 	}
