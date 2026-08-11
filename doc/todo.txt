@@ -1,7 +1,7 @@
 x- gauge field
 x- gauge multiplication operation
-(- plaquette computation)
-x- gauge action (?)
+x- plaquette computation
+x- gauge action
 x- conj momenta rand. sample
 - Hamiltonian function
 - momentum update
