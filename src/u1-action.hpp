@@ -20,10 +20,10 @@ double u1_action(double beta, u1_field & gauge) {
 	double sum = 0.0;
 	for (int x=0; x<N_DIM; ++x) {
 		for (int t=0; t<N_DIM; ++t) {
-			sum += real( plaquette(t, x, gauge) );
+			sum += (1.0 - real(plaquette(t, x, gauge)));
 		}
 	}
-	return beta * (1.0 - sum);
+	return beta * sum;
 }
 
 /*

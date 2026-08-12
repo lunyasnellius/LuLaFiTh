@@ -1,46 +1,47 @@
+#include <cmath>
+#include <iomanip>
+#include <iostream>
+#include <map>
+#include <random>
+#include <string>
+
 #include "include.hpp"
 
 
 int main() {
 
-	u1_field gauge(0.9, -0.7);
-	u1_field momenta(0.9, -0.7);
+	u1_field gauge;
+	u1_field momenta;
 
-	double beta = 9.5;
-
-	double out = u1_action(beta, gauge);
-	double ham = u1_hamilton(beta, gauge, momenta);
-
-	std::cout << "the action is \t\t" << out << std::endl;
-	std::cout << "the hamiltonian is\t" << ham << std::endl;
+	double beta_dynamics = 2.5;
+	double beta_sample = 1.5;
 
 	gauge.randomize(42);
 	momenta.randomize(13);
-	out = u1_action(beta, gauge);
-	ham = u1_hamilton(beta, gauge, momenta);
+
+	gauge.print();
+
+	double out = u1_action(beta_dynamics, gauge);
+	double ham_start = u1_hamilton(beta_sample, gauge, momenta);
 
 	std::cout << "\nafter randomization:\nthe action is \t\t" << out << std::endl;
-	std::cout << "the hamiltonian is\t" << ham << std::endl;
+	std::cout << "the hamiltonian is\t" << ham_start << std::endl;
 
-	std::cout << "sample link:\t\t" << gauge(1,1,0).val << std::endl;
-	std::cout << "sample mom:\t\t" << momenta(1,1,0).val << std::endl;
 
-	double time = 95.0;
-	int N = 1000;
+	double time = 0.95;
+	int N = 100;
 
-	//leapfrog(time, N, beta, momenta, gauge);
-	update_links(time, momenta, gauge);
-	update_momentum(time, beta, momenta, gauge);
+	leapfrog(time, N, beta_dynamics, momenta, gauge);
 
-	out = u1_action(beta, gauge);
-	ham = u1_hamilton(beta, gauge, momenta);
+	out = u1_action(beta_dynamics, gauge);
+	double ham_end = u1_hamilton(beta_sample, gauge, momenta);
+
+	double ac_prob = acc_rate(ham_start, ham_end);
 
 	std::cout << "\nafter leapfrog with (time, N_steps) = (" << time << ", " << N << "):" << std::endl;
 	std::cout << "the action is \t\t" << out << std::endl;
-	std::cout << "the hamiltonian is\t" << ham << std::endl;
+	std::cout << "the hamiltonian is\t" << ham_end << std::endl;
 
-	std::cout << "sample link:\t\t" << gauge(1,1,0).val << std::endl;
-	std::cout << "sample mom:\t\t" << momenta(1,1,0).val << std::endl;
 
 
 	return 0;

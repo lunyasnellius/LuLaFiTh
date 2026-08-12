@@ -31,33 +31,36 @@ struct theta {
 
 struct u1_field {
 	// for an 8x8 lattice
-	std::array<theta,N_DIM*N_DIM> thetat;
-	std::array<theta,N_DIM*N_DIM> thetax;
+	std::vector<theta> thetat;
+	std::vector<theta> thetax;
 
-	u1_field() = default;
-	u1_field(double a_val, double b_val) : thetat{a_val}, thetax{b_val} {
-		for (int i=0; i<(N_DIM*N_DIM);++i) {
-			thetat[i].val = a_val;
-			thetax[i].val = b_val;
-		}
-	}
+	u1_field() : thetat(N_DIM*N_DIM,0.0), thetax(N_DIM*N_DIM,0.0) {}
+	u1_field(double a_val, double b_val) : thetat(N_DIM*N_DIM,a_val), thetax(N_DIM*N_DIM,b_val) {}
 
 	void randomize(int seed) {
 		random_var random(seed);
-		for (int i=0; i<(N_DIM*N_DIM);++i) {
+		for (int i=0; i<(N_DIM*N_DIM); ++i) {
 			thetat[i].val = random();
 			thetax[i].val = random();
 		}
 	}
 
 
-	theta operator()(int t, int x, int mu) {
+	theta & operator()(int t, int x, int mu) {
 		int idx = N_DIM * periodic(t) + periodic(x);
 		if (mu == 0) {
 			return thetat[idx];
 		} else {
 			return thetax[idx];
 		}
+	}
+
+	void print() {
+		for (int i=0; i<N_DIM*N_DIM; ++i) {
+			if (i%(N_DIM) == 0) std::cout << "\n";
+			std::cout << "(" << thetat[i].val << "," << thetax[i].val << ")\t";
+		}
+		std::cout << "\n";
 	}
 
 }; // end of u1-field
