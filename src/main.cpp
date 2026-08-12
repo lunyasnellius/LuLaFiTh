@@ -27,7 +27,7 @@ int main() {
 	double ham_end;
 	double ac_prob;
 
-	gauge_backup.print_file("u1_g_field", "seed =" + std::to_string(seed1));
+	gauge_backup.print_file("u1_g_field", "seed = " + std::to_string(seed1));
 
 	int num_acc = 0;
 
@@ -52,15 +52,18 @@ int main() {
 			gauge_backup.print_file("u1_g_field", "seed = " + std::to_string(seed1) + ", accept/reject seed = " + std::to_string(seed3) + " acceptance rate = " + std::to_string(ac_prob));
 			//std::cout << ";\taccepted;\tac_rate = " << ac_prob << std::endl;
 			++num_acc;
+			printf("%.3e (!)\t", ac_prob);
 		} else {
 			//std::cout << ";\trejected;\tac_rate = " << ac_prob << std::endl;
+			printf("%.3e\t", ac_prob);
 		}
-		printf("%.3e\t", ac_prob);
 		if (i%10 == 9) std::cout << "\n";
 	}
 
 	std::cout << "\nnumber of accepted ensembles: " << num_acc << std::endl;
 
+
+	gauge_backup.load_file("ensembles/u1_g_field_00.csv");
 
 	return 0;
 

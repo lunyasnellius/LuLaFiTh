@@ -65,10 +65,9 @@ struct u1_field {
 
 	void print() {
 		for (int i=0; i<N_DIM*N_DIM; ++i) {
-			if (i%(N_DIM) == 0) std::cout << "\n";
 			std::cout << "(" << thetat[i].val << "," << thetax[i].val << ")\t";
+			if (i%(N_DIM) == N_DIM-1) std::cout << "\n";
 		}
-		std::cout << "\n";
 	}
 
 	void print_file(std::string base_name, std::string metadata = "no metadata") {
@@ -93,15 +92,47 @@ struct u1_field {
 		std::fstream file(name, std::fstream::out | std::fstream::app);
 		file << "# " << metadata << "\n";
 		for (int i=0; i<N_DIM*N_DIM; ++i) {
-			file << thetat[i].val << ", " << thetax[i].val;
+			file << std::scientific << thetat[i].val << "," << thetax[i].val;
 			if (i%(N_DIM) != (N_DIM-1)) {
-				file << ", ";
+				file << ",";
 			} else {
 				file << "\n";
 			}
 		}
 		file.close();
 		++num_prints;
+	}
+
+	void load_file(std::string name) {
+		if (!std::filesystem::exists(name)) {
+			std::cerr << "Error: file " << name << " does not exist!" << std::endl;
+			exit;
+		}
+
+		std::ifstream file(name);
+
+		if (!file.is_open()) {
+			std::cerr << "Error: file " << name << " could not be opened!" << std::endl;
+			exit;
+		}
+
+		std::string str;
+		int n = 0;
+		std::string metadata;
+		std::getline(file, metadata);
+
+		while (std::getline(file, str)) {
+			std::stringstream ss(str);
+			std::string elem;
+			while (std::getline(ss, elem, ',') && n<2*N_DIM*N_DIM) {
+				if (n%2 == 0) { thetat[n/2] = std::stod(elem); }
+				else { thetax[n/2] = std::stod(elem); }
+				++n;
+			}
+		}
+
+		std::cout << "File read: " << name << "\nMetadata: " << metadata << "\nField loaded:" << std::endl;
+		this -> print();
 	}
 
 	private:

@@ -10,6 +10,7 @@
 #include <string>
 #include <fstream>
 #include <filesystem>
+#include <sstream>
 
 constexpr int N_DIM = 4;
 
