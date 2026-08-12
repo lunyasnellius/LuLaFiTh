@@ -1,4 +1,5 @@
 # ignore current build
 /build/
+/ensembles/
 /src/depr/
 
