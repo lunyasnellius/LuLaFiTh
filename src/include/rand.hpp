@@ -3,19 +3,33 @@
 #include <random>
 
 
-struct random_var {
+struct random_theta {
 	std::mt19937 gen;
 	//std::uniform_real_distribution<double> dis;
-	std::normal_distribution<double> dis;//{0.0, 5.0};
+	std::normal_distribution<double> dis;
 
-	random_var() : gen(1), dis(0.0,0.5) {}//dis(-1.0,1.0) {}
-	random_var(int seed) : gen(seed), dis(0.0,0.5) {}//dis(-1.0,1.0) {}
+	random_theta() : gen(1), dis(0.0,0.5) {}//dis(-1.0,1.0) {}
+	random_theta(int seed) : gen(seed), dis(0.0,0.5) {}//dis(-1.0,1.0) {}
 
 	double operator()() {
 		return dis(gen);
 	}
 
-}; // end of rand
+}; // end of random_theta
+
+struct random_uniform {
+	//std::random_device rd{};
+	std::mt19937 gen;
+	std::uniform_real_distribution<double> dis;
+
+	random_uniform() : gen(1), dis(0.0,1.0) {}
+	random_uniform(int seed) : gen(seed), dis(0.0,1.0) {}
+
+	double operator()() {
+		return dis(gen);
+	}
+
+}; // end of random_uniform
 
 
 

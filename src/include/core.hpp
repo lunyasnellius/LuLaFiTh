@@ -7,6 +7,9 @@
 #include <vector>
 #include <numbers>
 #include <iostream>
+#include <string>
+#include <fstream>
+#include <filesystem>
 
 constexpr int N_DIM = 4;
 

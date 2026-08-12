@@ -1,47 +1,65 @@
-#include <cmath>
-#include <iomanip>
-#include <iostream>
-#include <map>
-#include <random>
-#include <string>
-
 #include "include.hpp"
 
 
 int main() {
 
 	u1_field gauge;
+	u1_field gauge_backup;
 	u1_field momenta;
 
-	double beta_dynamics = 2.5;
-	double beta_sample = 1.5;
+	double beta_dynamics = 4.62;
+	double beta_sample = 4.6;
 
-	gauge.randomize(42);
-	momenta.randomize(13);
+	std::random_device rd{};
+	int seed1 = rd();
+	int seed2 = rd();
+	int seed3 = rd();
 
-	gauge.print();
+	double time = 1.0;
+	int N_time = 16;
 
-	double out = u1_action(beta_dynamics, gauge);
-	double ham_start = u1_hamilton(beta_sample, gauge, momenta);
+	int N_steps = 100;
 
-	std::cout << "\nafter randomization:\nthe action is \t\t" << out << std::endl;
-	std::cout << "the hamiltonian is\t" << ham_start << std::endl;
+	gauge_backup.randomize(seed1);
+	momenta.randomize(seed2);
 
+	double ham_start;
+	double ham_end;
+	double ac_prob;
 
-	double time = 0.95;
-	int N = 100;
+	gauge_backup.print_file("u1_g_field", "seed =" + std::to_string(seed1));
 
-	leapfrog(time, N, beta_dynamics, momenta, gauge);
+	int num_acc = 0;
 
-	out = u1_action(beta_dynamics, gauge);
-	double ham_end = u1_hamilton(beta_sample, gauge, momenta);
+	for (int i=0; i<N_steps; ++i) {
+		gauge = gauge_backup;
+		//std::cout << "Step " << i+1 << " of " << N_steps;
+		seed2 = rd();
+		momenta.randomize(seed2);
+		ham_start = u1_hamilton(beta_sample, gauge, momenta);
+		//std::cout << ";\tH_start = " << ham_start;
 
-	double ac_prob = acc_rate(ham_start, ham_end);
+		leapfrog(time, N_time, beta_dynamics, momenta, gauge);
 
-	std::cout << "\nafter leapfrog with (time, N_steps) = (" << time << ", " << N << "):" << std::endl;
-	std::cout << "the action is \t\t" << out << std::endl;
-	std::cout << "the hamiltonian is\t" << ham_end << std::endl;
+		ham_end = u1_hamilton(beta_sample, gauge, momenta);
 
+		//std::cout << ";\tH_end = " << ham_end;
+
+		ac_prob = acc_rate(ham_start, ham_end);
+
+		if (acc_ensemble(ac_prob, seed3)) {
+			gauge_backup = gauge;
+			gauge_backup.print_file("u1_g_field", "seed = " + std::to_string(seed1) + ", accept/reject seed = " + std::to_string(seed3) + " acceptance rate = " + std::to_string(ac_prob));
+			//std::cout << ";\taccepted;\tac_rate = " << ac_prob << std::endl;
+			++num_acc;
+		} else {
+			//std::cout << ";\trejected;\tac_rate = " << ac_prob << std::endl;
+		}
+		printf("%.3e\t", ac_prob);
+		if (i%10 == 9) std::cout << "\n";
+	}
+
+	std::cout << "\nnumber of accepted ensembles: " << num_acc << std::endl;
 
 
 	return 0;
