@@ -1,7 +1,5 @@
 #pragma once
 
-#include "include/core.hpp"
-#include "include/rand.hpp"
 
 
 struct theta {

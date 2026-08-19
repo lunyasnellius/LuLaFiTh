@@ -1,6 +1,5 @@
 #pragma once
 
-#include "u1-hamilton.hpp"
 
 
 void update_momentum(double del_tau, double beta, u1_field & momenta, u1_field & gauge) {

@@ -1,7 +1,5 @@
 #pragma once
 
-#include "core.hpp"
-#include "../u1-field.hpp"
 
 
 double real(theta link) {

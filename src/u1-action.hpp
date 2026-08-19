@@ -1,8 +1,5 @@
 #pragma once
 
-#include "include/core.hpp"
-#include "include/functions.hpp"
-#include "u1-field.hpp"
 
 /* 
  * 2-dim plaquette computation at location (t,x) for u1 field gauge

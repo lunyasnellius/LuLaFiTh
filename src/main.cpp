@@ -18,7 +18,7 @@ int main() {
 	double time = 1.0;
 	int N_time = 16;
 
-	int N_steps = 100;
+	int N_steps = 1000;
 
 	gauge_backup.randomize(seed1);
 	momenta.randomize(seed2);
@@ -26,12 +26,17 @@ int main() {
 	double ham_start;
 	double ham_end;
 	double ac_prob;
+	double loop_av;
 
 	gauge_backup.print_file("u1_g_field", "seed = " + std::to_string(seed1));
 
 	int num_acc = 0;
+	int i = 0;
 
-	for (int i=0; i<N_steps; ++i) {
+	std::fstream file("loop_val.csv", std::fstream::out | std::fstream::app);
+	file << "N_it,loop_av\n";
+	//for (int i=0; i<N_steps; ++i) {
+	while (num_acc <= 100) {
 		gauge = gauge_backup;
 		//std::cout << "Step " << i+1 << " of " << N_steps;
 		seed2 = rd();
@@ -53,17 +58,24 @@ int main() {
 			//std::cout << ";\taccepted;\tac_rate = " << ac_prob << std::endl;
 			++num_acc;
 			printf("%.3e (!)\t", ac_prob);
+			loop_av = u1_loop(gauge_backup);
+			file << num_acc << "," << std::scientific << loop_av << "\n";
 		} else {
 			//std::cout << ";\trejected;\tac_rate = " << ac_prob << std::endl;
 			printf("%.3e\t", ac_prob);
 		}
 		if (i%10 == 9) std::cout << "\n";
+
+		++i;
 	}
+	file.close();
 
 	std::cout << "\nnumber of accepted ensembles: " << num_acc << std::endl;
 
 
 	gauge_backup.load_file("ensembles/u1_g_field_00.csv");
+
+
 
 	return 0;
 

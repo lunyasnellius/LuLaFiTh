@@ -1,5 +1,4 @@
-#include "time-ev.hpp"
-
+#pragma once
 
 double acc_rate(double H_start, double H_end) {
 	double tmp = H_end - H_start;
