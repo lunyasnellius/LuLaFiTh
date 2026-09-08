@@ -6,7 +6,7 @@ fi
 
 mkdir build && cd build
 
-cmake ..
+cmake ../LuLaFiTh
 
 cmake --build .
 
