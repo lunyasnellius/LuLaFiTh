@@ -1,5 +1,5 @@
 #pragma once
-
+#include <Kokkos_Core.hpp>
 
 
 struct theta {
@@ -27,43 +27,73 @@ struct theta {
 }; // end of theta
 
 
+void fill_view(Kokkos::View<theta**[2], Kokkos::DefaultHostExecutionSpace> &field_view, double value) {
+	Kokkos::parallel_for("fill_view", Kokkos::MDRangePolicy<Kokkos::DefaultHostExecutionSpace,Kokkos::Rank<2>> ({0,0}, {field_view.extent(0), field_view.extent(1)}), KOKKOS_LAMBDA(const int i, const int j) {
+		field_view(i,j,0) = value;
+		field_view(i,j,1) = value;
+	});
+	Kokkos::fence();
+}
+
+void fill_view_random(Kokkos::View<theta**[2], Kokkos::DefaultHostExecutionSpace> &field_view, const int seed) {
+	Kokkos::parallel_for("fill_view_random", Kokkos::MDRangePolicy<Kokkos::DefaultHostExecutionSpace,Kokkos::Rank<2>> ({0,0}, {field_view.extent(0), field_view.extent(1)}), KOKKOS_LAMBDA(const int i, const int j) {
+		random_theta random(seed + i*field_view.extent(1) + j);
+		//double tmp = random();
+		field_view(i,j,0) = random();//tmp;
+		//tmp = random();
+		field_view(i,j,1) = random();//tmp;
+	});
+	Kokkos::fence();
+}
+
 struct u1_field {
 	// for an 8x8 lattice
-	std::vector<theta> thetat;
-	std::vector<theta> thetax;
+	Kokkos::View<theta**[2],Kokkos::DefaultHostExecutionSpace> thetas;
+	//std::vector<theta> thetat;
+	//std::vector<theta> thetax;
 
-	u1_field() : thetat(N_DIM*N_DIM,0.0), thetax(N_DIM*N_DIM,0.0) {}
-	u1_field(double a_val, double b_val) : thetat(N_DIM*N_DIM,a_val), thetax(N_DIM*N_DIM,b_val) {}
+	u1_field(std::string name = "u1_field") : 
+	thetas(Kokkos::view_alloc(Kokkos::WithoutInitializing, name), N_DIM, N_DIM) {
+		fill_view(thetas, 0.0);
+	}
+	//thetat(N_DIM*N_DIM,0.0), thetax(N_DIM*N_DIM,0.0) {}
+	u1_field(double val, std::string name = "u1_field") : 
+	thetas(Kokkos::view_alloc(Kokkos::WithoutInitializing, name), N_DIM, N_DIM) {
+		fill_view(thetas, val);
+	}
+	//thetat(N_DIM*N_DIM,a_val), thetax(N_DIM*N_DIM,b_val) {}
+	u1_field(int seed, std::string name = "u1_field") :
+	thetas(Kokkos::view_alloc(Kokkos::WithoutInitializing, name), N_DIM, N_DIM) {
+		fill_view_random(thetas, seed);
+	}
 
 	void randomize(int seed) {
-		random_theta random(seed);
-		for (int i=0; i<(N_DIM*N_DIM); ++i) {
-			thetat[i] = random();
-			thetax[i] = random();
-		}
+		fill_view_random(thetas, seed);
 	}
 
 
-	theta & operator()(int t, int x, int mu) {
-		int idx = N_DIM * periodic(t) + periodic(x);
-		if (mu == 0) {
-			return thetat[idx];
-		} else {
-			return thetax[idx];
-		}
+	KOKKOS_FORCEINLINE_FUNCTION
+	theta & operator()(const int t, const int x, const int mu) const {
+		return thetas(periodic(t),periodic(x),mu);
 	}
 
 	u1_field & operator=(u1_field & other) {
-		for (int i=0; i<(N_DIM*N_DIM); ++i) {
-			thetat[i] = other.thetat[i];
-			thetax[i] = other.thetax[i];
-		}
+		Kokkos::deep_copy(thetas, other.thetas);
+		Kokkos::fence();
 		return *this;
+	}
+
+	KOKKOS_FUNCTION
+	void print(int t, int x) {
+		printf("(%f,%f);", thetas(t,x,0).val, thetas(t,x,1).val);
 	}
 
 	void print() {
 		for (int i=0; i<N_DIM*N_DIM; ++i) {
-			std::cout << "(" << thetat[i].val << "," << thetax[i].val << ")\t";
+			int x = i/N_DIM;
+			int y = i%N_DIM;
+			this -> print(x,y);
+			//printf("(%f,%f);", thetas(x,y,0), thetas(x,y,1));
 			if (i%(N_DIM) == N_DIM-1) std::cout << "\n";
 		}
 	}
@@ -90,7 +120,9 @@ struct u1_field {
 		std::fstream file(name, std::fstream::out | std::fstream::app);
 		file << "# " << metadata << "\n";
 		for (int i=0; i<N_DIM*N_DIM; ++i) {
-			file << std::scientific << thetat[i].val << "," << thetax[i].val;
+			int x = i/N_DIM;
+			int y = i%N_DIM;
+			file << std::scientific << thetas(x,y,0).val << "," << thetas(x,y,1).val;
 			if (i%(N_DIM) != (N_DIM-1)) {
 				file << ",";
 			} else {
@@ -123,8 +155,10 @@ struct u1_field {
 			std::stringstream ss(str);
 			std::string elem;
 			while (std::getline(ss, elem, ',') && n<2*N_DIM*N_DIM) {
-				if (n%2 == 0) { thetat[n/2] = std::stod(elem); }
-				else { thetax[n/2] = std::stod(elem); }
+				int x = (n/2)/N_DIM;
+				int y = (n/2)%N_DIM;
+				if (n%2 == 0) { thetas(x, y, 0) = std::stod(elem); }
+				else { thetas(x, y, 1) = std::stod(elem); }
 				++n;
 			}
 		}
@@ -134,6 +168,7 @@ struct u1_field {
 	}
 
 	private:
+	// tracking how many times weve printed to file
 	static int num_prints;
 
 

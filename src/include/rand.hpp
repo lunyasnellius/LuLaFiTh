@@ -1,4 +1,5 @@
 #pragma once
+#include <Kokkos_Core.hpp>
 
 
 
@@ -10,6 +11,7 @@ struct random_theta {
 	random_theta() : gen(1), dis(0.0,0.5) {}//dis(-1.0,1.0) {}
 	random_theta(int seed) : gen(seed), dis(0.0,0.5) {}//dis(-1.0,1.0) {}
 
+	KOKKOS_FUNCTION
 	double operator()() {
 		return dis(gen);
 	}
@@ -24,6 +26,7 @@ struct random_uniform {
 	random_uniform() : gen(1), dis(0.0,1.0) {}
 	random_uniform(int seed) : gen(seed), dis(0.0,1.0) {}
 
+	KOKKOS_FUNCTION
 	double operator()() {
 		return dis(gen);
 	}

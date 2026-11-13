@@ -1,10 +1,11 @@
 
 
-if [ -d build ]; then 
-	rm -r build
-fi 
+#if [ -d build ]; then 
+#	rm -r build
+#fi 
 
-mkdir build && cd build
+mkdir -p build 
+cd build
 
 cmake ../LuLaFiTh
 

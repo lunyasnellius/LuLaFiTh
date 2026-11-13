@@ -17,6 +17,6 @@ FetchContent_MakeAvailable(Kokkos)
 
 
 add_executable(test src/main.cpp)
-
+target_link_libraries(test Kokkos::kokkos)
 
 

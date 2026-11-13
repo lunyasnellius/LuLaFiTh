@@ -11,17 +11,18 @@
 #include <fstream>
 #include <filesystem>
 #include <sstream>
+#include <Kokkos_Core.hpp>
 
-constexpr int N_DIM = 4;
+constexpr int N_DIM = 6;
 
 double pi_val = std::numbers::pi_v<double>;
 
-enum dir {
+enum dir : const int {
 	T_DIR = 0,
 	X_DIR = 1
 };
 
-
+KOKKOS_FORCEINLINE_FUNCTION
 double constrain(double angle) {
 	double tmp = angle;
 	if (angle >= 1.0) {
@@ -35,6 +36,7 @@ double constrain(double angle) {
 	}
 }
 
+KOKKOS_FORCEINLINE_FUNCTION
 int periodic(int index) {
 	if (index < 0) {
 		return N_DIM + index;
